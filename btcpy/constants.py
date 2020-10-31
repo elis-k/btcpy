@@ -16,7 +16,7 @@ class Constants(object):
                                      'testnet': 'tb'},
                'bech32.hrp_to_net': {'bc': 'mainnet',
                                      'tb': 'testnet'},
-               'xkeys.prefixes': {'mainnet': 'x', 'testnet': 't'},
+               'xkeys.prefixes': {'mainnet': ['x','z','y'], 'testnet': 't'},
                'xpub.version': {'mainnet': b'\x04\x88\xb2\x1e', 'testnet': b'\x04\x35\x87\xcf'},
                'xprv.version': {'mainnet': b'\x04\x88\xad\xe4', 'testnet': b'\x04\x35\x83\x94'},
                'xpub.prefix': {'mainnet': 'xpub', 'testnet': 'tpub'},
