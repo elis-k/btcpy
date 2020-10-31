@@ -40,7 +40,7 @@ class ExtendedKey(HexSerializable, metaclass=ABCMeta):
     @strictness
     def decode(cls, string, strict=None):
 
-        if string[0] == Constants.get('xkeys.prefixes')['mainnet']:
+        if string[0] in Constants.get('xkeys.prefixes')['mainnet']:
             mainnet = True
         elif string[0] == Constants.get('xkeys.prefixes')['testnet']:
             mainnet = False
