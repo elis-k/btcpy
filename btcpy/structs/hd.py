@@ -55,6 +55,7 @@ class ExtendedKey(HexSerializable, metaclass=ABCMeta):
         cls._check_decode(string)
 
         decoded = b58decode_check(string)
+        version = decoded[0:4]
         parser = Parser(bytearray(decoded))
         parser >> 4
         depth = int.from_bytes(parser >> 1, 'big')
@@ -79,7 +80,7 @@ class ExtendedKey(HexSerializable, metaclass=ABCMeta):
 
         key = subclass.decode_key(keydata)
 
-        return subclass(key, chaincode, depth, fingerprint, index, hardened)
+        return subclass(key, chaincode, depth, fingerprint, index, version, hardened)
 
     @staticmethod
     @abstractmethod
@@ -90,12 +91,7 @@ class ExtendedKey(HexSerializable, metaclass=ABCMeta):
     def _check_decode(string):
         pass
 
-    @staticmethod
-    @abstractmethod
-    def get_version(mainnet=None):
-        raise NotImplemented
-
-    def __init__(self, key, chaincode, depth, pfing, index, hardened=False):
+    def __init__(self, key, chaincode, depth, pfing, index, version, hardened=False):
         if not 0 <= depth <= 255:
             raise ValueError('Depth must be between 0 and 255')
         self.key = key
@@ -104,6 +100,7 @@ class ExtendedKey(HexSerializable, metaclass=ABCMeta):
         self.parent_fingerprint = pfing
         self.index = index
         self.hardened = hardened
+        self.version = veresion
 
     def derive(self, path):
         """
@@ -166,7 +163,7 @@ class ExtendedKey(HexSerializable, metaclass=ABCMeta):
     def serialize(self, mainnet=None):
         cls = self.__class__
         result = Stream()
-        result << cls.get_version(mainnet)
+        result << self.version
         result << self.depth.to_bytes(1, 'big')
         result << self.parent_fingerprint
         if self.hardened:
@@ -179,7 +176,7 @@ class ExtendedKey(HexSerializable, metaclass=ABCMeta):
 
     def __str__(self):
         return 'version: {}\ndepth: {}\nparent fp: {}\n' \
-               'index: {}\nchaincode: {}\nkey: {}\nhardened: {}'.format(self.__class__.get_version(),
+               'index: {}\nchaincode: {}\nkey: {}\nhardened: {}'.format(self.version,
                                                                         self.depth,
                                                                         self.parent_fingerprint,
                                                                         self.index,
@@ -197,13 +194,6 @@ class ExtendedKey(HexSerializable, metaclass=ABCMeta):
 
 
 class ExtendedPrivateKey(ExtendedKey):
-
-    @staticmethod
-    def get_version(mainnet=None):
-        if mainnet is None:
-            mainnet = is_mainnet()
-        # using net_name here would ignore the mainnet=None flag
-        return Constants.get('xprv.version')['mainnet' if mainnet else 'testnet']
 
     @staticmethod
     def decode_key(keydata):
@@ -253,13 +243,6 @@ class ExtendedPrivateKey(ExtendedKey):
 
 
 class ExtendedPublicKey(ExtendedKey):
-
-    @staticmethod
-    def get_version(mainnet=None):
-        if mainnet is None:
-            mainnet = is_mainnet()
-        # using net_name here would ignore the mainnet=None flag
-        return Constants.get('xpub.version')['mainnet' if mainnet else 'testnet']
 
     @staticmethod
     def decode_key(keydata):
