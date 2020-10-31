@@ -19,8 +19,8 @@ class Constants(object):
                'xkeys.prefixes': {'mainnet': ['x','z','y'], 'testnet': 't'},
                'xpub.version': {'mainnet': b'\x04\x88\xb2\x1e', 'testnet': b'\x04\x35\x87\xcf'},
                'xprv.version': {'mainnet': b'\x04\x88\xad\xe4', 'testnet': b'\x04\x35\x83\x94'},
-               'xpub.prefix': {'mainnet': 'xpub', 'testnet': 'tpub'},
-               'xprv.prefix': {'mainnet': 'xprv', 'testnet': 'tprv'},
+               'xpub.prefix': {'mainnet': ['xpub','zpub','ypub'], 'testnet': 'tpub'},
+               'xprv.prefix': {'mainnet': ['xprv','zpriv','ypriv'], 'testnet': 'tprv'},
                'wif.prefixes': {'mainnet': 0x80, 'testnet': 0xef},
                'from_unit': Decimal('1e-8'),
                'to_unit': Decimal('1e8')
