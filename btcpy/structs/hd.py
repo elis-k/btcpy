@@ -42,7 +42,7 @@ class ExtendedKey(HexSerializable, metaclass=ABCMeta):
 
         if string[0] in Constants.get('xkeys.prefixes')['mainnet']:
             mainnet = True
-        elif string[0] == Constants.get('xkeys.prefixes')['testnet']:
+        elif string[0] in Constants.get('xkeys.prefixes')['testnet']:
             mainnet = False
         else:
             raise ValueError('Encoded key not recognised: {}'.format(string))
@@ -211,7 +211,7 @@ class ExtendedPrivateKey(ExtendedKey):
 
     @staticmethod
     def _check_decode(string):
-        if string[:4] not in (Constants.get('xprv.prefix').values()):
+        if string[:4] not in Constants.get('xprv.prefix')['mainnet'] and string[:4] not in Constants.get('xprv.prefix')['testnet']:
             raise ValueError('Non matching prefix: {}'.format(string[:4]))
 
     def __init__(self, key, chaincode, depth, pfing, index, hardened=False):
@@ -267,7 +267,7 @@ class ExtendedPublicKey(ExtendedKey):
 
     @staticmethod
     def _check_decode(string):
-        if string[:4] not in (Constants.get('xpub.prefix').values()):
+        if string[:4] not in Constants.get('xpub.prefix')['mainnet'] and string[:4] not in Constants.get('xpub.prefix')['testnet']:
             raise ValueError('Non matching prefix: {}'.format(string[:4]))
 
     def __init__(self, key, chaincode, depth, pfing, index, hardened=False):
