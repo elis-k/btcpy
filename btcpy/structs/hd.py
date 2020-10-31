@@ -33,8 +33,8 @@ class ExtendedKey(HexSerializable, metaclass=ABCMeta):
     curve_order = SECP256k1.order
 
     @classmethod
-    def master(cls, key, chaincode):
-        return cls(key, chaincode, 0, cls.master_parent_fingerprint, 0, hardened=True)
+    def master(cls, key, version, chaincode):
+        return cls(key, chaincode, 0, cls.master_parent_fingerprint, 0, version, hardened=True)
 
     @classmethod
     @strictness
@@ -100,7 +100,7 @@ class ExtendedKey(HexSerializable, metaclass=ABCMeta):
         self.parent_fingerprint = pfing
         self.index = index
         self.hardened = hardened
-        self.version = veresion
+        self.version = version
 
     def derive(self, path):
         """
@@ -190,6 +190,7 @@ class ExtendedKey(HexSerializable, metaclass=ABCMeta):
                     self.depth == other.depth,
                     self.parent_fingerprint == other.parent_fingerprint,
                     self.index == other.index,
+                    self.version == other.version,
                     self.hardened == other.hardened])
 
 
@@ -204,10 +205,10 @@ class ExtendedPrivateKey(ExtendedKey):
         if string[:4] not in Constants.get('xprv.prefix')['mainnet'] and string[:4] not in Constants.get('xprv.prefix')['testnet']:
             raise ValueError('Non matching prefix: {}'.format(string[:4]))
 
-    def __init__(self, key, chaincode, depth, pfing, index, hardened=False):
+    def __init__(self, key, chaincode, depth, pfing, index, version, hardened=False):
         if not isinstance(key, PrivateKey):
             raise TypeError('ExtendedPrivateKey expects a PrivateKey')
-        super().__init__(key, chaincode, depth, pfing, index, hardened)
+        super().__init__(key, chaincode, depth, pfing, index, version, hardened)
 
     def __int__(self):
         return int.from_bytes(self.key.key, 'big')
@@ -234,11 +235,15 @@ class ExtendedPrivateKey(ExtendedKey):
         return self.pub()._serialize_key()
 
     def pub(self):
+        net_type = 'mainnet' if self.version in Constants.get('xpriv.versions')['mainnet'] else 'testnet'
+        version_index = Constants.get('xpriv.versions')[net_type].index(self.version) 
+        pub_version = Constants.get('xpub.versions')[net_type][version_index]
         return ExtendedPublicKey(self.key.pub(),
                                  self.chaincode,
                                  self.depth,
                                  self.parent_fingerprint,
                                  self.index,
+                                 pub_version,
                                  self.hardened)
 
 
@@ -253,10 +258,10 @@ class ExtendedPublicKey(ExtendedKey):
         if string[:4] not in Constants.get('xpub.prefix')['mainnet'] and string[:4] not in Constants.get('xpub.prefix')['testnet']:
             raise ValueError('Non matching prefix: {}'.format(string[:4]))
 
-    def __init__(self, key, chaincode, depth, pfing, index, hardened=False):
+    def __init__(self, key, chaincode, depth, pfing, index, version, hardened=False):
         if not isinstance(key, PublicKey):
             raise TypeError('ExtendedPublicKey expects a PublicKey')
-        super().__init__(key.compress(), chaincode, depth, pfing, index, hardened)
+        super().__init__(key.compress(), chaincode, depth, pfing, index, version, hardened)
 
     def __int__(self):
         return int.from_bytes(self.key.key, 'big')
