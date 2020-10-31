@@ -202,7 +202,7 @@ class ExtendedPrivateKey(ExtendedKey):
 
     @staticmethod
     def _check_decode(string):
-        if string[:4] not in Constants.get('xprv.prefix')['mainnet'] and string[:4] not in Constants.get('xprv.prefix')['testnet']:
+        if string[:4] not in Constants.get('xprv.prefixes')['mainnet'] and string[:4] not in Constants.get('xprv.prefixes')['testnet']:
             raise ValueError('Non matching prefix: {}'.format(string[:4]))
 
     def __init__(self, key, chaincode, depth, pfing, index, version, hardened=False):
@@ -255,7 +255,7 @@ class ExtendedPublicKey(ExtendedKey):
 
     @staticmethod
     def _check_decode(string):
-        if string[:4] not in Constants.get('xpub.prefix')['mainnet'] and string[:4] not in Constants.get('xpub.prefix')['testnet']:
+        if string[:4] not in Constants.get('xpub.prefixes')['mainnet'] and string[:4] not in Constants.get('xpub.prefixes')['testnet']:
             raise ValueError('Non matching prefix: {}'.format(string[:4]))
 
     def __init__(self, key, chaincode, depth, pfing, index, version, hardened=False):
