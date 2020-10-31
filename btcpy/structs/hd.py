@@ -223,6 +223,7 @@ class ExtendedPrivateKey(ExtendedKey):
                                   self.depth + 1,
                                   self.get_fingerprint(),
                                   index,
+                                  self.version,
                                   hardened)
 
     def get_fingerprint(self):
@@ -275,7 +276,7 @@ class ExtendedPublicKey(ExtendedKey):
                  + VerifyingKey.from_string(self.key.uncompressed[1:], curve=SECP256k1).pubkey.point)
         if point == INFINITY:
             raise ValueError('Computed point equals INFINITY')
-        return ExtendedPublicKey(PublicKey.from_point(point), right, self.depth+1, self.get_fingerprint(), index, False)
+        return ExtendedPublicKey(PublicKey.from_point(point), right, self.depth+1, self.get_fingerprint(), index, self.version, False)
 
     def get_hash(self, index, hardened=False):
         if hardened:
